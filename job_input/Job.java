@@ -31,6 +31,30 @@ public class Job {
 		return sum;
 	}
 	
+	public int getTotalItemCount() {
+		int itemCount = 0;
+		for (Entry<Item, Integer> i: ITEMS.entrySet()) {
+			itemCount += i.getValue();
+		}
+		return itemCount;
+	}
+	
+	public double getTotalReward() {
+		double reward = 0;
+		for (Entry<Item, Integer> i: ITEMS.entrySet()) {
+			reward += i.getKey().getReward() * i.getValue();
+		}
+		return reward;
+	}
+	
+	public double getTotalWeight() {
+		double weight = 0;
+		for (Entry<Item, Integer> i: ITEMS.entrySet()) {
+			weight += i.getKey().getWeight() * i.getValue();
+		}
+		return weight;
+	}
+	
 	public State getState() {
 		return this.state;
 	}

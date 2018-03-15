@@ -22,8 +22,10 @@ public class CancellationPredictor {
 
 		int totalNumTraining = 0;
 		int totalNumTest = 0;
-		int trueNum = 0;
-		int falseNum = 0;
+		int trueNumTraining = 0;
+		int falseNumTraining = 0;
+		int trueNumTest = 0;
+		int falseNumTest = 0;
 		int correctNum = 0;
 		int numOfFeatures = 10;
 		Boolean cancellation = false;
@@ -57,14 +59,18 @@ public class CancellationPredictor {
 			if(cancellation) {
 				a++;
 				bayes.learn(cancellation, Arrays.asList(features));
-				trueNum++;
+				trueNumTraining++;
 				totalNumTraining++;	
 			}
 			else {
-				if(falseNum < 4500) {
+//				a++;
+//				bayes.learn(cancellation, Arrays.asList(features));
+//				falseNumTraining++;
+//				totalNumTraining++;
+				if(falseNumTraining < 4500) {
 					a++;
 					bayes.learn(cancellation, Arrays.asList(features));
-					falseNum++;
+					falseNumTraining++;
 					totalNumTraining++;
 				}
 			}
@@ -99,6 +105,12 @@ public class CancellationPredictor {
 			classification = bayes.classify(Arrays.asList(features)).getCategory();
 			if(cancellation.equals(classification)) {
 				correctNum++;
+				if(cancellation && classification) {
+					trueNumTest++;
+				}
+				if(!cancellation && !classification) {
+					falseNumTest++;
+				}
 			}
 			totalNumTest++;
 		}
@@ -108,12 +120,14 @@ public class CancellationPredictor {
 		System.out.println("\n");
 		
 		System.out.println("\nTRAINING");
-		System.out.println("Num of true: " + trueNum);
-		System.out.println("Num of false: " + falseNum);
+		System.out.println("Num of true: " + trueNumTraining);
+		System.out.println("Num of false: " + falseNumTraining);
 		System.out.println("Total number: " + totalNumTraining);
 		
 		System.out.println("\nTEST");
-		System.out.println("Correct number: " + correctNum);
+		System.out.println("Num of times 'true' correctly classified: " + trueNumTest);
+		System.out.println("Num of times 'false' correctly classified: " + falseNumTest);
+		System.out.println("Total correctly classified: " + correctNum);
 		System.out.println("Total number: " + totalNumTest);
 		System.out.print("Percentage correct: ");
 		System.out.printf("%.2f", percent);

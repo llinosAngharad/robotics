@@ -25,9 +25,11 @@ public class CancellationPredictor {
 		int trueNum = 0;
 		int falseNum = 0;
 		int correctNum = 0;
-		int numOfFeatures = 5;
-		Boolean cancellation = false;;
-		Boolean classification = false;;
+		int numOfFeatures = 15;
+		Boolean cancellation = false;
+		Boolean classification = false;
+		Boolean ca = false;
+		Boolean cl = false;
 		Boolean[] features = null;
 		
 		//make cancellationList
@@ -41,7 +43,7 @@ public class CancellationPredictor {
 		 * context.
 		 */
 		final Classifier<Boolean, Boolean> bayes = new BayesClassifier<Boolean, Boolean>();
-		
+		System.out.println("\nEXAMPLES:\n");
 		for(int i = 0; i < cancellationList.size() - (numOfFeatures + 1); i++) {
 			int counter = 0;
 			int maxIndex = i + numOfFeatures;
@@ -54,19 +56,23 @@ public class CancellationPredictor {
 			if(cancellation) {
 				bayes.learn(cancellation, Arrays.asList(features));
 				trueNum++;
-				totalNumTraining++;
+				totalNumTraining++;	
 			}
 			else {
-				bayes.learn(cancellation, Arrays.asList(features));
-				falseNum++;
-				totalNumTraining++;
-//				if(falseNum < 4500) {
-//					bayes.learn(cancellation, Arrays.asList(features));
-//					falseNum++;
-//					totalNumTraining++;
-//				}
+//				bayes.learn(cancellation, Arrays.asList(features));
+//				falseNum++;
+//				totalNumTraining++;
+				if(falseNum < 4500) {
+					bayes.learn(cancellation, Arrays.asList(features));
+					falseNum++;
+					totalNumTraining++;
+				}
 			}
+			System.out.println("target output: " + ca + ", actual output: " + cl); //should output false
+			System.out.println(((BayesClassifier<Boolean, Boolean>) bayes).classifyDetailed(Arrays.asList(features)));
+			System.out.println("\n");
 		}
+
 
 		/*
 		 * The classifier can learn from classifications that are handed over to the
@@ -93,16 +99,16 @@ public class CancellationPredictor {
 			}
 			cancellation = cancellationList.get(maxIndex + 1);
 			classification = bayes.classify(Arrays.asList(features)).getCategory();
+			if(cancellation && totalNumTest < 5) {
+				ca = cancellation;
+				cl = classification;
+			}
 			if(cancellation.equals(classification)) {
 				correctNum++;
 			}
 			totalNumTest++;
 		}
 		Float percent = ((float)correctNum / (float)totalNumTest) * 100;
-		
-		System.out.println("\nExample:");
-		System.out.println("target output: " + cancellation + ", actual output: " + classification); //should output false
-		System.out.println(((BayesClassifier<Boolean, Boolean>) bayes).classifyDetailed(Arrays.asList(features)));
 		
 		System.out.println("\nTRAINING");
 		System.out.println("Num of true: " + trueNum);

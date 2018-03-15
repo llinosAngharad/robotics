@@ -25,7 +25,7 @@ public class CancellationPredictor {
 		int trueNum = 0;
 		int falseNum = 0;
 		int correctNum = 0;
-		int numOfFeatures = 15;
+		int numOfFeatures = 10;
 		Boolean cancellation = false;
 		Boolean classification = false;
 		Boolean ca = false;
@@ -42,6 +42,7 @@ public class CancellationPredictor {
 		 * context will be classified with a String according to the featureset of the
 		 * context.
 		 */
+		int a = 0;
 		final Classifier<Boolean, Boolean> bayes = new BayesClassifier<Boolean, Boolean>();
 		System.out.println("\nEXAMPLES:\n");
 		for(int i = 0; i < cancellationList.size() - (numOfFeatures + 1); i++) {
@@ -54,23 +55,20 @@ public class CancellationPredictor {
 			}
 			cancellation = cancellationList.get(maxIndex);
 			if(cancellation) {
+				a++;
 				bayes.learn(cancellation, Arrays.asList(features));
 				trueNum++;
 				totalNumTraining++;	
 			}
 			else {
-//				bayes.learn(cancellation, Arrays.asList(features));
-//				falseNum++;
-//				totalNumTraining++;
 				if(falseNum < 4500) {
+					a++;
 					bayes.learn(cancellation, Arrays.asList(features));
 					falseNum++;
 					totalNumTraining++;
 				}
 			}
-			System.out.println("target output: " + ca + ", actual output: " + cl); //should output false
-			System.out.println(((BayesClassifier<Boolean, Boolean>) bayes).classifyDetailed(Arrays.asList(features)));
-			System.out.println("\n");
+			System.out.println(a + " - cancellation: " + cancellation + ", featureSet: " + Arrays.asList(features).toString());
 		}
 
 
@@ -97,18 +95,17 @@ public class CancellationPredictor {
 			    features[counter] = cancellationList.get(j);
 			    counter++;  
 			}
-			cancellation = cancellationList.get(maxIndex + 1);
+			cancellation = cancellationList.get(maxIndex);
 			classification = bayes.classify(Arrays.asList(features)).getCategory();
-			if(cancellation && totalNumTest < 5) {
-				ca = cancellation;
-				cl = classification;
-			}
 			if(cancellation.equals(classification)) {
 				correctNum++;
 			}
 			totalNumTest++;
 		}
 		Float percent = ((float)correctNum / (float)totalNumTest) * 100;
+		
+//		System.out.println(((BayesClassifier<Boolean, Boolean>) bayes).classifyDetailed(Arrays.asList(features)));
+		System.out.println("\n");
 		
 		System.out.println("\nTRAINING");
 		System.out.println("Num of true: " + trueNum);
